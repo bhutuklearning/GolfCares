@@ -124,3 +124,5 @@ cypress/screenshots
 *.zip
 .idea/**/*
 .vscode/**/*
+
+client/ts_errors.txt
