@@ -99,7 +99,7 @@ NODE_ENV=development
 # Database
 MONGODB_URI=mongodb://localhost:27017/golfcares
 # Or for MongoDB Atlas:
-# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/golfcares
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/DBName
 
 # JWT
 JWT_SECRET=your_jwt_secret_key_here
