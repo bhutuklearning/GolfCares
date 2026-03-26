@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 160 100% 39%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 248 88% 70%;
+    --accent-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 160 100% 39%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border box-border; }
+  body {
+    @apply bg-brand-dark text-white font-sans antialiased;
+    background-color: #0A0F1E;
+  }
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #111827; }
+::-webkit-scrollbar-thumb { background: #00C896; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #00a87e; }
+
+.gradient-text {
+  @apply bg-gradient-to-r from-brand-green to-brand-accent bg-clip-text text-transparent;
+}
+
+.glass-card {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+}
+
+.glow-green {
+  box-shadow: 0 0 40px rgba(0, 200, 150, 0.15);
+}
+
+.glow-accent {
+  box-shadow: 0 0 40px rgba(108, 99, 255, 0.15);
+}
