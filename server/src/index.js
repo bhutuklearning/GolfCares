@@ -59,7 +59,7 @@ app.use('/api/draws', drawRouter)
 app.use('/api/winners', winnerRouter)
 app.use('/api/admin', adminRouter)
 
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` })
 })
 
