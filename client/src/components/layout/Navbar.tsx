@@ -14,6 +14,7 @@ export default function Navbar() {
 
   const links = [
     { path: '/', label: 'Home' },
+    ...(isAuthenticated ? [{ path: '/dashboard', label: 'Dashboard' }] : []),
     { path: '/charities', label: 'Charities' },
     { path: '/draws', label: 'Draws' },
   ]
