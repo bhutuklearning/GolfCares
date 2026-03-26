@@ -1,130 +1,55 @@
 // @ts-nocheck
 import { useQuery } from '@tanstack/react-query'
-import { Users, Trophy, Heart, Activity } from 'lucide-react'
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
+import { Loader2, TrendingUp, Users, Trophy, Heart } from 'lucide-react'
 import { adminApi } from '@/api/admin.api'
-import { useAuthStore } from '@/store/authStore'
-import { mockAdminStats } from '@/mocks/mockData'
-import { formatCurrency } from '@/utils/helpers'
+import StatCard from '@/components/shared/StatCard'
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 export default function AdminDashboard() {
-  const { useMockData } = useAuthStore()
-  
-  const { data, isLoading } = useQuery<any>({ queryKey: ['adminStats'], queryFn: () => adminApi.getStats(),  enabled: !useMockData  })
-  const stats = useMockData ? mockAdminStats : data?.stats || null
+  const { data, isLoading } = useQuery({ queryKey: ['adminStats'], queryFn: adminApi.getStats })
+  const stats = data?.stats || data
 
-  // Chart placeholder data
-  const revenueData = [
-    { name: 'Jan', value: 4000 },
-    { name: 'Feb', value: 3000 },
-    { name: 'Mar', value: 2000 },
-    { name: 'Apr', value: 2780 },
-    { name: 'May', value: 1890 },
-    { name: 'Jun', value: 2390 },
-    { name: 'Jul', value: 3490 },
-  ]
-
-  if (isLoading) {
-    return <div className="text-white animate-pulse">Loading dashboard...</div>
-  }
+  if (isLoading) return (
+    <div className="flex justify-center items-center min-h-[300px]">
+      <Loader2 className="w-10 h-10 text-brand-green animate-spin" />
+    </div>
+  )
 
   return (
-    <div className="animate-in fade-in duration-500">
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-black text-white">Platform Overview</h1>
-        <p className="text-gray-400 mt-1">High-level metrics and system status.</p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-black text-white">Admin Dashboard</h1>
+        <p className="text-gray-400 mt-1">Platform overview and key metrics.</p>
       </div>
 
-      {/* Stats KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg relative overflow-hidden group hover:border-red-500/30 transition-colors">
-          <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity"><Users className="w-32 h-32 text-white" /></div>
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Total Users</p>
-          <p className="text-4xl font-black text-white">{stats?.totalUsers?.toLocaleString() || 0}</p>
-        </div>
-        
-        <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg relative overflow-hidden group hover:border-red-500/30 transition-colors">
-          <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity"><Activity className="w-32 h-32 text-brand-green" /></div>
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-            Active Subs <span className="w-2 h-2 rounded-full bg-brand-green animate-pulse" />
-          </p>
-          <p className="text-4xl font-black text-brand-green">{stats?.activeSubscriptions?.toLocaleString() || 0}</p>
-        </div>
-        
-        <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg relative overflow-hidden group hover:border-red-500/30 transition-colors">
-          <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity"><Heart className="w-32 h-32 text-brand-accent" /></div>
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Total Donated</p>
-          <p className="text-4xl font-black text-brand-accent">{formatCurrency(stats?.totalCharityDonations || 0)}</p>
-        </div>
-        
-        <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg relative overflow-hidden group hover:border-red-500/30 transition-colors">
-          <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity"><Trophy className="w-32 h-32 text-brand-gold" /></div>
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Total Prizes Paid</p>
-          <p className="text-4xl font-black text-brand-gold">{formatCurrency(stats?.totalPrizesPaid || 0)}</p>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={Users} label="Total Users" value={stats?.totalUsers || 0} color="green" />
+        <StatCard icon={TrendingUp} label="Active Subs" value={stats?.activeSubscriptions || 0} color="accent" />
+        <StatCard icon={Trophy} label="Total Draws" value={stats?.totalDraws || 0} color="gold" />
+        <StatCard icon={Heart} label="Charity Funded" value={`£${(stats?.totalDonated || 0).toFixed(0)}`} color="red" />
       </div>
 
-      {/* Main Chart Area */}
-      <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg mb-8">
-        <h3 className="font-bold text-lg text-white mb-6">Revenue Growth</h3>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+      {stats?.revenueByMonth && stats.revenueByMonth.length > 0 && (
+        <div className="bg-brand-card border border-white/5 rounded-2xl p-6">
+          <h2 className="text-xl font-bold text-white mb-6">Monthly Revenue</h2>
+          <ResponsiveContainer width="100%" height={260}>
+            <AreaChart data={stats.revenueByMonth}>
               <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00C896" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#00C896" stopOpacity={0}/>
+                <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#00C896" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#00C896" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="name" stroke="#9CA3AF" fontSize={12} tickLine={false} axisLine={false} dy={10} />
-              <YAxis stroke="#9CA3AF" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `£${val}`} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#111827', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
-                itemStyle={{ color: '#00C896', fontWeight: 'bold' }}
-              />
-              <Area type="monotone" dataKey="value" stroke="#00C896" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+              <XAxis dataKey="month" stroke="#6B7280" tick={{ fontSize: 12 }} />
+              <YAxis stroke="#6B7280" tick={{ fontSize: 12 }} tickFormatter={(v) => `£${v}`} />
+              <Tooltip contentStyle={{ background: '#111827', border: '1px solid #1F2937', borderRadius: 12 }}
+                labelStyle={{ color: '#fff' }} formatter={(v: any) => [`£${v}`, 'Revenue']} />
+              <Area type="monotone" dataKey="revenue" stroke="#00C896" strokeWidth={2} fill="url(#revGrad)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </div>
-
-      {/* System Status */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg">
-          <h3 className="font-bold text-lg text-white mb-4">System Status</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5">
-              <span className="text-sm text-gray-300">Stripe Webhooks</span>
-              <span className="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded border border-green-500/20">OPERATIONAL</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5">
-              <span className="text-sm text-gray-300">Background Jobs</span>
-              <span className="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded border border-green-500/20">OPERATIONAL</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/5">
-              <span className="text-sm text-gray-300">Database Connection</span>
-              <span className="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded border border-green-500/20">OPERATIONAL</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#0a0f1e] border border-brand-green/20 rounded-2xl p-6 shadow-lg">
-          <h3 className="font-bold text-lg text-white mb-2 text-brand-green">Quick Actions</h3>
-          <p className="text-sm text-gray-400 mb-6">Frequently used administrative tasks.</p>
-          <div className="space-y-3">
-            <button className="w-full text-left p-3 rounded-xl bg-brand-green/10 text-brand-green hover:bg-brand-green hover:text-black font-bold text-sm transition-colors border border-brand-green/20">
-              Trigger Manual Draw
-            </button>
-            <button className="w-full text-left p-3 rounded-xl border border-white/10 text-white hover:bg-white/5 font-bold text-sm transition-colors">
-              Export Charity Donation Report
-            </button>
-            <button className="w-full text-left p-3 rounded-xl border border-white/10 text-white hover:bg-white/5 font-bold text-sm transition-colors">
-              Process Winner Payouts
-            </button>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   )
 }

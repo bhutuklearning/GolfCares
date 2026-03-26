@@ -1,5 +1,6 @@
 // @ts-nocheck
 import api from './axios'
+
 export const charityApi = {
   getCharities: (params?: any) => api.get('/api/charities', { params }).then(r => r.data),
   getFeatured: () => api.get('/api/charities/featured').then(r => r.data),

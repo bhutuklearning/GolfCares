@@ -1,300 +1,165 @@
 // @ts-nocheck
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Target, Plus, Minus, Pencil, Trash2, Loader2 } from 'lucide-react'
-import { format } from 'date-fns'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import { Loader2, Plus, Trash2, Pencil, X, Check } from 'lucide-react'
 import { scoreApi } from '@/api/score.api'
-import { useAuthStore } from '@/store/authStore'
-import { mockScores } from '@/mocks/mockData'
-import { formatDate } from '@/utils/helpers'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import LotteryBall from '@/components/shared/LotteryBall'
 
 export default function ScoresPage() {
-  const [editingScore, setEditingScore] = useState<any>(null)
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-  const [isAdding, setIsAdding] = useState(false)
-  
   const queryClient = useQueryClient()
-  const { useMockData } = useAuthStore()
+  const [showForm, setShowForm] = useState(false)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [editScore, setEditScoreVal] = useState<number | ''>('')
+  const [newScore, setNewScore] = useState<number | ''>('')
 
-  const { data: scoresData, isLoading } = useQuery({ queryKey: ['scores'], queryFn: scoreApi.getScores,  enabled: !useMockData  })
-  const scores = useMockData ? mockScores : scoresData?.scores || []
+  const { data, isLoading } = useQuery({ queryKey: ['scores'], queryFn: scoreApi.getScores })
+  const scores = data?.scores || []
 
-  const { register, handleSubmit, setValue, watch, reset } = useForm({
-    defaultValues: {
-      value: 36,
-      date: format(new Date(), 'yyyy-MM-dd')
-    }
+  const addMutation = useMutation({
+    mutationFn: (score: number) => scoreApi.addScore({ stablefordScore: score }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['scores'] })
+      toast.success('Score added!')
+      setNewScore('')
+      setShowForm(false)
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || 'Failed to add score'),
   })
-  
-  const scoreValue = watch('value')
 
-  const { register: registerEdit, handleSubmit: handleEditSubmit, setValue: setEditValue, watch: watchEdit } = useForm()
-  const editScoreValue = watchEdit('value')
-
-  // Open Edit Dialog
-  const openEdit = (score: any) => {
-    setEditValue('value', score.value)
-    setEditValue('date', format(new Date(score.date), 'yyyy-MM-dd'))
-    setEditingScore(score)
-  }
-
-  const handleAdd = async (data: any) => {
-    try {
-      setIsAdding(true)
-      if (useMockData) {
-        toast.success('Mock: Score added successfully')
-        reset({ value: 36, date: format(new Date(), 'yyyy-MM-dd') })
-        return
-      }
-      await scoreApi.addScore(data)
-      toast.success('Score added successfully')
+  const editMutation = useMutation({
+    mutationFn: ({ id, score }: { id: string; score: number }) => scoreApi.editScore(id, { stablefordScore: score }),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scores'] })
-      reset({ value: 36, date: format(new Date(), 'yyyy-MM-dd') })
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to add score')
-    } finally {
-      setIsAdding(false)
-    }
-  }
+      toast.success('Score updated!')
+      setEditId(null)
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || 'Failed to update score'),
+  })
 
-  const handleEdit = async (data: any) => {
-    try {
-      if (useMockData) {
-        toast.success('Mock: Score updated successfully')
-        setEditingScore(null)
-        return
-      }
-      await scoreApi.editScore(editingScore._id, data)
-      toast.success('Score updated successfully')
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => scoreApi.deleteScore(id),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scores'] })
-      setEditingScore(null)
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update score')
-    }
-  }
+      toast.success('Score removed')
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || 'Failed to delete score'),
+  })
 
-  const handleDelete = async () => {
-    if (!deleteConfirm) return
-    try {
-      if (useMockData) {
-        toast.success('Mock: Score deleted successfully')
-        setDeleteConfirm(null)
-        return
-      }
-      await scoreApi.deleteScore(deleteConfirm)
-      toast.success('Score deleted successfully')
-      queryClient.invalidateQueries({ queryKey: ['scores'] })
-      setDeleteConfirm(null)
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to delete score')
-    }
-  }
+  if (isLoading) return (
+    <div className="flex justify-center items-center min-h-[300px]">
+      <Loader2 className="w-10 h-10 text-brand-green animate-spin" />
+    </div>
+  )
 
-  const today = format(new Date(), 'yyyy-MM-dd')
+  const ticketNumbers = scores.slice(0, 5).map((s: any) => s.stablefordScore).filter(Boolean)
 
   return (
-    <div className="animate-in fade-in duration-500">
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-black text-white">My Scores</h1>
-        <p className="text-gray-400 mt-1">Log your Stableford scores to enter the monthly draw</p>
-      </div>
-
-      {/* Add Score Form */}
-      <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg mb-8">
-        <form onSubmit={handleSubmit(handleAdd)} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-          <div>
-            <Label className="text-gray-300">Stableford Score</Label>
-            <div className="flex items-center gap-3 mt-2">
-              <button 
-                type="button" 
-                onClick={() => setValue('value', Math.max(1, scoreValue - 1))}
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <Input 
-                {...register('value', { valueAsNumber: true })} 
-                type="number" 
-                min={1} 
-                max={45} 
-                className="text-center text-xl font-bold h-10 bg-brand-muted border-white/10 text-white focus-visible:ring-brand-green flex-1"
-              />
-              <button 
-                type="button" 
-                onClick={() => setValue('value', Math.min(45, scoreValue + 1))}
-                className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-          
-          <div>
-            <Label className="text-gray-300">Date Played</Label>
-            <Input 
-              {...register('date')} 
-              type="date" 
-              max={today} 
-              className="mt-2 h-10 bg-brand-muted border-white/10 text-white focus-visible:ring-brand-green" 
-            />
-          </div>
-          
-          <Button 
-            type="submit" 
-            disabled={isAdding}
-            className="w-full bg-brand-green text-black hover:bg-brand-green/90 font-bold h-10 rounded-lg shadow-lg shadow-brand-green/20"
-          >
-            {isAdding ? <Loader2 className="animate-spin w-5 h-5" /> : '+ Add Score'}
-          </Button>
-        </form>
-      </div>
-
-      {/* Progress Bar Section */}
-      <div className="bg-brand-card border border-white/5 rounded-2xl p-6 shadow-lg mb-8 flex flex-col items-center">
-        <p className="text-sm font-bold text-gray-300 mb-4 tracking-widest uppercase">Monthly Draw Progress</p>
-        <div className="flex gap-2 w-full max-w-sm">
-          {[0,1,2,3,4].map(i => (
-            <div key={i} className={`h-3 rounded-full flex-1 transition-all duration-500 ${i < scores.length ? 'bg-brand-green shadow-[0_0_10px_rgba(0,200,150,0.5)]' : 'bg-white/10'}`} />
-          ))}
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black text-white">My Scores</h1>
+          <p className="text-gray-400 mt-1">Log your Stableford scores to enter the monthly draw.</p>
         </div>
-        <p className="text-gray-400 mt-4 text-sm font-medium">
-          {scores.length}/5 scores entered {scores.length >= 5 ? '🎉 You are set for the draw!' : ''}
-        </p>
-      </div>
-
-      {/* Scores List */}
-      <div className="space-y-3">
-        {isLoading ? (
-          Array.from({length: 3}).map((_, i) => (
-            <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse"></div>
-          ))
-        ) : scores.length === 0 ? (
-          <div className="text-center py-16 bg-white/5 border border-white/5 border-dashed rounded-2xl">
-            <Target className="w-12 h-12 mx-auto mb-3 opacity-30 text-brand-green" />
-            <p className="text-gray-300 font-medium">No scores yet.</p>
-            <p className="text-sm text-gray-500 mt-1">Add your first score above!</p>
-          </div>
-        ) : (
-          <AnimatePresence>
-            {scores.map((score: any) => (
-              <motion.div 
-                key={score._id}
-                layout
-                initial={{ opacity: 0, x: -20 }} 
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="flex items-center gap-4 bg-brand-card border border-white/5 rounded-xl p-4 md:p-5 shadow-lg group hover:border-white/10 transition-colors"
-              >
-                <div className="text-sm text-gray-400 w-24 md:w-32 font-medium">
-                  {formatDate(score.date)}
-                </div>
-                
-                <div className={`text-3xl font-black w-16 text-center
-                  ${score.value >= 30 ? 'text-brand-green' : score.value >= 20 ? 'text-yellow-400' : 'text-red-400'}`}>
-                  {score.value}
-                </div>
-                
-                <div className="hidden sm:block">
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-brand-accent/10 text-brand-accent tracking-wider uppercase border border-brand-accent/20">
-                    Stableford
-                  </span>
-                </div>
-                
-                <div className="flex-1" />
-                
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => openEdit(score)}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => setDeleteConfirm(score._id)}
-                    className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+        {scores.length < 5 && !showForm && (
+          <button onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-brand-green text-black font-bold rounded-xl hover:bg-brand-green/90 transition-all">
+            <Plus className="w-4 h-4" /> Add Score
+          </button>
         )}
       </div>
 
-      {/* Edit Dialog */}
-      <Dialog open={editingScore !== null} onOpenChange={(open) => !open && setEditingScore(null)}>
-        <DialogContent className="bg-brand-card border-white/10 text-white sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Score</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleEditSubmit(handleEdit)} className="space-y-6 pt-4">
-            <div>
-              <Label className="text-gray-300">Stableford Score</Label>
-              <div className="flex items-center gap-3 mt-2">
-                <button 
-                  type="button" 
-                  onClick={() => setEditValue('value', Math.max(1, editScoreValue - 1))}
-                  className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10"
-                >
-                  <Minus className="w-5 h-5" />
-                </button>
-                <Input 
-                  {...registerEdit('value', { valueAsNumber: true })} 
-                  type="number" 
-                  min={1} max={45} 
-                  className="text-center text-2xl font-bold h-12 bg-brand-muted border-white/10 text-white focus-visible:ring-brand-green flex-1"
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setEditValue('value', Math.min(45, editScoreValue + 1))}
-                  className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors border border-white/10"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
+      {/* Ticket preview */}
+      {ticketNumbers.length > 0 && (
+        <div className="bg-brand-card border border-brand-green/20 rounded-2xl p-6">
+          <p className="text-sm text-gray-400 mb-4 font-medium">Your current lottery numbers:</p>
+          <div className="flex gap-3 flex-wrap">
+            {ticketNumbers.map((n: number, i: number) => <LotteryBall key={i} number={n} index={i} />)}
+            {Array.from({ length: Math.max(0, 5 - ticketNumbers.length) }).map((_, i) => (
+              <div key={i} className="w-12 h-12 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center">
+                <span className="text-gray-600 text-xs">?</span>
               </div>
-            </div>
-            <div>
-              <Label className="text-gray-300">Date Played</Label>
-              <Input 
-                {...registerEdit('date')} 
-                type="date" 
-                max={today} 
-                className="mt-2 h-12 bg-brand-muted border-white/10 text-white focus-visible:ring-brand-green" 
-              />
-            </div>
-            <Button type="submit" className="w-full bg-brand-green text-black font-bold h-12 rounded-xl hover:bg-brand-green/90">
-              Save Changes
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+            ))}
+          </div>
+        </div>
+      )}
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirm !== null} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
-        <DialogContent className="bg-brand-card border-white/10 text-white sm:max-w-sm text-center p-8">
-          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-6">
-            <Trash2 className="w-8 h-8 text-red-400" />
+      {/* Add form */}
+      {showForm && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-brand-card border border-brand-green/20 rounded-2xl p-6">
+          <h3 className="font-bold text-white mb-4">Add New Score</h3>
+          <div className="flex items-center gap-3">
+            <input
+              type="number" min={0} max={60}
+              value={newScore}
+              onChange={(e) => setNewScore(Number(e.target.value))}
+              placeholder="Stableford score (0–60)"
+              className="flex-1 bg-brand-muted border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-brand-green"
+            />
+            <button onClick={() => newScore !== '' && addMutation.mutate(Number(newScore))}
+              disabled={addMutation.isPending || newScore === ''}
+              className="px-5 py-3 bg-brand-green text-black font-bold rounded-xl hover:bg-brand-green/90 transition-all disabled:opacity-50 flex items-center gap-2">
+              {addMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              Save
+            </button>
+            <button onClick={() => setShowForm(false)} className="p-3 text-gray-400 hover:text-white transition-colors">
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <DialogTitle className="text-xl mb-2">Delete this score?</DialogTitle>
-          <p className="text-gray-400 text-sm mb-8 mt-2">This action cannot be undone. It might remove your entry for this month's draw.</p>
-          <div className="flex gap-4">
-            <Button variant="ghost" className="flex-1 hover:bg-white/5 text-white" onClick={() => setDeleteConfirm(null)}>
-              Cancel
-            </Button>
-            <Button className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold" onClick={handleDelete}>
-              Delete
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        </motion.div>
+      )}
+
+      {/* Scores list */}
+      {scores.length === 0 ? (
+        <div className="bg-brand-card border border-white/5 rounded-2xl p-12 text-center">
+          <p className="text-gray-400">No scores yet. Add your first Stableford score to get into the draw!</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {scores.map((score: any, i: number) => (
+            <motion.div key={score._id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+              className="bg-brand-card border border-white/5 rounded-xl p-5 flex items-center gap-4">
+              <LotteryBall number={score.stablefordScore} index={i} size="sm" />
+              <div className="flex-1">
+                {editId === score._id ? (
+                  <div className="flex items-center gap-2">
+                    <input type="number" min={0} max={60} value={editScore}
+                      onChange={(e) => setEditScoreVal(Number(e.target.value))}
+                      className="w-24 bg-brand-muted border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-brand-green" />
+                    <button onClick={() => editScore !== '' && editMutation.mutate({ id: score._id, score: Number(editScore) })}
+                      className="p-1.5 text-brand-green hover:bg-brand-green/10 rounded-lg transition-colors">
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setEditId(null)} className="p-1.5 text-gray-400 hover:bg-white/5 rounded-lg transition-colors">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="font-bold text-white">{score.stablefordScore} pts</p>
+                    <p className="text-xs text-gray-500">{new Date(score.date || score.createdAt).toLocaleDateString('en-GB')}</p>
+                  </div>
+                )}
+              </div>
+              {editId !== score._id && (
+                <div className="flex items-center gap-2">
+                  <button onClick={() => { setEditId(score._id); setEditScoreVal(score.stablefordScore) }}
+                    className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => deleteMutation.mutate(score._id)}
+                    disabled={deleteMutation.isPending}
+                    className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { mockUser, mockSubscription } from '../mocks/mockData'
 
 interface User {
   _id: string
@@ -18,12 +17,10 @@ interface AuthState {
   token: string | null
   subscription: any | null
   isAuthenticated: boolean
-  useMockData: boolean
-  login: (user: User, token: string, subscription: any) => void
+  login: (user: User, token: string, subscription?: any) => void
   logout: () => void
   updateUser: (data: Partial<User>) => void
   updateSubscription: (data: any) => void
-  enableMockMode: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -33,27 +30,17 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       subscription: null,
       isAuthenticated: false,
-      useMockData: false,
 
-      login: (user, token, subscription) =>
+      login: (user, token, subscription = null) =>
         set({ user, token, subscription, isAuthenticated: true }),
 
       logout: () =>
-        set({ user: null, token: null, subscription: null, isAuthenticated: false, useMockData: false }),
+        set({ user: null, token: null, subscription: null, isAuthenticated: false }),
 
       updateUser: (data) =>
         set({ user: get().user ? { ...get().user!, ...data } : null }),
 
       updateSubscription: (data) => set({ subscription: data }),
-
-      enableMockMode: () =>
-        set({
-          user: mockUser as User,
-          token: 'mock-token-dev',
-          subscription: mockSubscription,
-          isAuthenticated: true,
-          useMockData: true,
-        }),
     }),
     { name: 'golfcares-auth' }
   )
