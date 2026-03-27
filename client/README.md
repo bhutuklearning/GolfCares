@@ -1,17 +1,23 @@
+<div align="center">
+  <img src="./public/GolfCares.png" alt="GolfCares Logo" width="300" />
+  <br />
+  <img src="./public/Favicon.png" alt="GolfCares Favicon" width="64" />
+</div>
+
 # GolfCares Frontend
 
-React-based frontend application for the GolfCares lottery platform, built with Vite and TypeScript for optimal development experience and performance.
+A React-based frontend application for the GolfCares lottery platform, built with Vite and TypeScript for an optimal development experience and high performance.
 
 ## Overview
 
-This is a modern, type-safe React application providing a user interface for lottery ticket purchasing, charity discovery, draw participation, and admin dashboard functionality. The application uses Vite for fast development and build times, and integrates with the GolfCares backend API.
+This is a modern, type-safe React application providing a user interface for lottery ticket purchasing, charity discovery, draw participation, and admin dashboard functionality. The application uses Vite for fast development and build times, and integrates seamlessly with the GolfCares backend API.
 
 ## Technology Stack
 
 - **React 19.2.4** - UI library
 - **Vite 5+** - Build tool and development server
 - **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
+- **Tailwind CSS** - Styling framework
 - **Shadcn UI** - Component library
 - **React Router** - Client-side routing
 - **React Hook Form** - Form handling
@@ -21,46 +27,47 @@ This is a modern, type-safe React application providing a user interface for lot
 - **Stripe** - Payment processing
 - **Zod** - Schema validation
 - **Framer Motion** - Animations
-- **Lucide React** - Icons
+- **Lucide React** - Iconography
 
 ## Project Structure
 
-```
+```text
 src/
 ├── api/                    # Axios instances and API clients
-│   ├── axios.ts           # Configured Axios client
-│   ├── auth.api.ts        # Authentication endpoints
-│   ├── charity.api.ts     # Charity endpoints
-│   ├── draw.api.ts        # Draw endpoints
+│   ├── axios.ts            # Configured Axios client
+│   ├── auth.api.ts         # Authentication endpoints
+│   ├── charity.api.ts      # Charity endpoints
+│   ├── draw.api.ts         # Draw endpoints
 │   ├── subscription.api.ts # Subscription endpoints
-│   └── ...other APIs
+│   └── ...
 ├── components/
-│   ├── layout/            # Layout components (Navbar, Footer)
-│   ├── shared/            # Reusable components
+│   ├── layout/             # Layout components (Navbar, Footer)
+│   ├── shared/             # Reusable components
 │   │   ├── ProtectedRoute.tsx
 │   │   ├── AdminRoute.tsx
 │   │   ├── PageWrapper.tsx
 │   │   └── ...
-│   └── ui/                # Shadcn UI components
-├── pages/                 # Page components
-│   ├── dashboard/         # User dashboard pages
-│   ├── admin/             # Admin pages
+│   └── ui/                 # Shadcn UI components
+├── pages/                  # Page components
+│   ├── dashboard/          # User dashboard pages
+│   ├── admin/              # Admin pages
 │   ├── HomePage.tsx
 │   ├── LoginPage.tsx
 │   └── ...
-├── store/                 # Zustand stores
-│   └── authStore.ts       # Authentication state
-├── lib/                   # Utility functions
+├── store/                  # Zustand stores
+│   └── authStore.ts        # Authentication state
+├── lib/                    # Utility functions
 │   └── utils.ts
-├── mocks/                 # Mock data for development
+├── mocks/                  # Mock data for development
 │   └── mockData.ts
-├── App.tsx                # Root component
-└── main.tsx               # Application entry point
+├── App.tsx                 # Root component
+└── main.tsx                # Application entry point
 ```
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 16 or higher
 - npm or yarn
 
@@ -78,7 +85,7 @@ npm run dev
 
 The application will start on `http://localhost:5173`. Vite provides Hot Module Replacement (HMR) for instant updates during development.
 
-### Building
+### Building for Production
 
 ```bash
 npm run build
@@ -89,7 +96,7 @@ Creates an optimized production build in the `dist/` directory.
 ### Linting
 
 ```bash
-npm lint
+npm run lint
 ```
 
 Runs ESLint to check code quality and consistency.
@@ -147,89 +154,59 @@ VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
 
 ### Component Configuration
 
-UI component library is configured via `components.json` for Shadcn components. Add new components using:
+The UI component library is configured via `components.json` for Shadcn components. Add new components using the CLI:
 
 ```bash
 npx shadcn@latest add component-name
 ```
 
-## Development Tips
+## Development Best Practices
 
-### Component Best Practices
+### Component Design
 - Use TypeScript for all components
-- Leverage Shadcn UI components for consistency
-- Use React Hook Form for form handling
-- Implement Zod schemas for form validation
+- Leverage Shadcn UI components for visual consistency
+- Use React Hook Form for robust form handling
+- Implement Zod schemas for form and API response validation
 
 ### API Integration
 - Use custom hooks from `@tanstack/react-query` for data fetching
-- Centralize API calls in `/api` folder
+- Centralize API calls in the `/api` folder
 - Use Axios request/response interceptors for auth headers
 
 ### State Management
 - Use Zustand for persistent client state (auth, user preferences)
 - Use React Query for server state (draws, charities, user data)
-- Keep component state local when possible
+- Keep component state local when global access is unnecessary
 
 ### Styling
-- Use Tailwind CSS utility classes
-- Leverage Shadcn UI components
-- Maintain consistent spacing and sizing
-- Use CSS modules for component-scoped styles when needed
+- Use Tailwind CSS utility classes uniformly
+- Maintain consistent spacing and sizing according to the defined theme
+- Override Shadcn component styles via Tailwind extending classes
 
 ## Performance Optimization
 
 - Code splitting via React Router lazy loading
-- Image optimization with Vite
+- Image optimization
 - React.lazy for component-level code splitting
-- Memoization for heavy components
+- Memoization for expensive computations
 - React Query caching strategies
 
 ## Type Safety
 
-All TypeScript files should include proper type definitions. Avoid using `any` type unless absolutely necessary. Use Zod for runtime validation of API responses.
-
-## Routing
-
-Routes are configured in the main application tree. Protected routes require authentication via the `ProtectedRoute` component. Admin routes require admin privileges via the `AdminRoute` component.
-
-## Testing
-
-Test files should follow the pattern: `ComponentName.test.tsx` or `module.test.ts`
-
-(Test setup and utilities to be added)
-
-## Building for Production
-
-The production build is optimized and minified. All environment variables must be set before building:
-
-```bash
-npm run build
-```
-
-This creates a production-ready bundle ready for deployment to services like Vercel, Netlify, or AWS.
+All TypeScript files must include proper type definitions. Avoid using the `any` type aggressively. Rely on Zod for runtime validation of API responses to ensure type consistency at the integration boundary.
 
 ## Troubleshooting
 
 ### Port Already in Use
-If port 5173 is already in use, Vite will automatically use the next available port.
+If port 5173 is already in use, Vite will automatically use the next available port. Check the terminal output for the correct local URL.
 
 ### CORS Errors
-Ensure the backend is running and `VITE_API_BASE_URL` is correctly configured to match your backend URL.
+Ensure the backend is running and `VITE_API_BASE_URL` is correctly configured to match the backend origin.
 
 ### Build Errors
-Clear the build cache and node_modules:
+Clear the build cache and reinstall modules if persistent errors occur:
 ```bash
 rm -rf dist node_modules
 npm install
 npm run build
 ```
-
-## Further Documentation
-
-- Vite Documentation: https://vitejs.dev
-- React Documentation: https://react.dev
-- Tailwind CSS: https://tailwindcss.com
-- Shadcn UI: https://ui.shadcn.com
-- React Query: https://tanstack.com/query
-- TypeScript: https://www.typescriptlang.org

@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="./client/public/GolfCares.png" alt="GolfCares Logo" width="300" />
+  <br />
+  <img src="./client/public/Favicon.png" alt="GolfCares Favicon" width="64" />
+</div>
+
 # GolfCares Technical Assessment
 
 A full-stack lottery platform built with modern web technologies, featuring charity integration, payment processing, and real-time draw management.
@@ -10,14 +16,14 @@ GolfCares is a comprehensive lottery and charitable giving platform that connect
 
 This is a monorepo containing two main applications:
 
-- **Client**: React + Vite frontend with TypeScript
+- **Client**: React and Vite frontend with TypeScript
 - **Server**: Express.js backend with MongoDB
 
 ## Tech Stack
 
 ### Frontend (Client)
 - React 19.2.4 with TypeScript
-- Vite - Fast build tool and dev server
+- Vite - Fast build tool and development server
 - TanStack React Query - Data fetching and caching
 - React Router - Client-side routing
 - Tailwind CSS - Utility-first styling
@@ -41,7 +47,7 @@ This is a monorepo containing two main applications:
 
 ## Project Structure
 
-```
+```text
 Technical-assessment/
 ├── client/                 # React frontend application
 │   ├── src/
@@ -61,13 +67,13 @@ Technical-assessment/
 │   │   ├── jobs/           # Scheduled tasks
 │   │   └── config/         # Configuration
 │   └── package.json
-└── README.md
-
+└── Readme.md
 ```
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 16+ and npm/yarn
 - MongoDB instance (local or cloud)
 - Stripe account and API keys
@@ -86,15 +92,15 @@ cd ../server
 npm install
 ```
 
-2. Configure environment variables:
+2. Configure environment variables for the server:
 
 ```bash
-# Server-side (.env in server/)
+cd server
 cp .env.sample .env
-# Update with your Stripe, Cloudinary, MongoDB, and email credentials
+# Update the .env file with your Stripe, Cloudinary, MongoDB, and email credentials
 ```
 
-3. Start development servers:
+3. Start the development servers:
 
 ```bash
 # Terminal 1 - Frontend
@@ -107,17 +113,19 @@ npm run dev
 ```
 
 The frontend will be available at `http://localhost:5173` (Vite default).
-The backend API will run on `http://localhost:3000` (or configured port).
+The backend API will run on `http://localhost:3000` (or the configured port).
 
 ## Available Scripts
 
 ### Client
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run lint` - Run ESLint
 - `npm run preview` - Preview production build
 
 ### Server
+
 - `npm run dev` - Start development server with auto-reload (nodemon)
 - `npm start` - Start in production mode
 - `npm run seed` - Seed database with initial data
@@ -136,27 +144,6 @@ The backend API will run on `http://localhost:3000` (or configured port).
 - Email notifications for draws and wins
 - Protected routes and role-based access control
 
-## API Endpoints
-
-Key API routes are organized by feature:
-- `/api/auth` - Authentication endpoints
-- `/api/draws` - Lottery draw management
-- `/api/charities` - Charity information
-- `/api/subscriptions` - Subscription handling
-- `/api/winners` - Winner management
-- `/api/scores` - Score tracking
-- `/api/admin` - Admin operations
-
-## Database Models
-
-- **User** - User accounts with credentials and roles
-- **Draw** - Lottery draw events and scheduling
-- **Charity** - Partnered organizations
-- **Subscription** - User subscription plans
-- **Score** - User participation and scoring
-- **Winner** - Draw winners and winnings
-- **Ticket** - Individual lottery tickets
-
 ## Development Guidelines
 
 - Use TypeScript in frontend code for type safety
@@ -165,12 +152,6 @@ Key API routes are organized by feature:
 - Use environment variables for sensitive configuration
 - Write meaningful commit messages
 - Maintain consistent code formatting
-
-## Error Handling
-
-The application implements centralized error handling:
-- Frontend: Axios interceptors and error boundaries
-- Backend: Express error middleware with proper HTTP status codes
 
 ## Security Considerations
 
@@ -181,21 +162,3 @@ The application implements centralized error handling:
 - CORS configuration for cross-origin requests
 - Input validation and sanitization with express-validator
 - Secure credential management via environment variables
-
-## Deployment
-
-Deployment configurations and CI/CD setup will be added as the project progresses. Both applications can be deployed to platforms like Vercel (frontend) and Heroku/Railway (backend).
-
-## Contributing
-
-As this is an active technical assessment, all code should follow the existing patterns and conventions established in the codebase.
-
-## Future Enhancements
-
-- Comprehensive test coverage (unit and integration tests)
-- Advanced analytics and reporting
-- Additional payment methods beyond Stripe
-- Mobile application (React Native)
-- GraphQL API option
-- Enhanced security features (2FA, encryption)
-- Performance optimization and caching strategies
