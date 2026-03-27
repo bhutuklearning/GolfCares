@@ -58,7 +58,7 @@ export default function HomePage() {
           >
             Every Stroke Counts.
             <br />
-            <span className="gradient-text">Every Pound Gives.</span>
+            <span className="gradient-text">Every Point Gives.</span>
           </motion.h1>
 
           <motion.p
