@@ -95,7 +95,6 @@ export default function HomePage() {
           className="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-500 flex flex-col items-center gap-2 cursor-pointer"
           onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
         >
-          <span className="text-xs font-medium tracking-widest uppercase">Scroll</span>
           <ChevronDown className="w-5 h-5" />
         </motion.div>
       </section>
@@ -156,7 +155,7 @@ export default function HomePage() {
               <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🏆</div>
               <h3 className="text-lg font-bold text-gray-300">5-Number Match</h3>
               <div className="text-4xl font-black text-brand-gold mt-4 mb-2">
-                £{(draw?.prizePool?.fiveMatch || 0).toFixed(2)}
+                ₹{(draw?.prizePool?.fiveMatch || 0).toFixed(2)}
               </div>
               <p className="text-sm text-gray-500 font-medium">Jackpot Prize</p>
             </div>
@@ -164,7 +163,7 @@ export default function HomePage() {
               <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">🥈</div>
               <h3 className="text-gray-400 font-bold">4-Number Match</h3>
               <div className="text-4xl font-black text-gray-300 mt-4 mb-2">
-                £{(draw?.prizePool?.fourMatch || 0).toFixed(2)}
+                ₹{(draw?.prizePool?.fourMatch || 0).toFixed(2)}
               </div>
               <p className="text-sm text-gray-500">Shared Pool</p>
             </div>
@@ -172,7 +171,7 @@ export default function HomePage() {
               <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">🥉</div>
               <h3 className="text-gray-400 font-bold">3-Number Match</h3>
               <div className="text-4xl font-black text-brand-accent mt-4 mb-2">
-                £{(draw?.prizePool?.threeMatch || 0).toFixed(2)}
+                ₹{(draw?.prizePool?.threeMatch || 0).toFixed(2)}
               </div>
               <p className="text-sm text-gray-500">Shared Pool</p>
             </div>
@@ -208,7 +207,7 @@ export default function HomePage() {
                     <p className="text-gray-400 text-sm line-clamp-2 flex-1 mb-6">{charity.description}</p>
                     <div className="flex items-center justify-between border-t border-white/10 pt-4">
                       <span className="text-xs font-bold bg-brand-green/10 text-brand-green px-3 py-1.5 rounded-full">
-                        £{charity.totalReceived?.toLocaleString() || 0} raised
+                        ₹{charity.totalReceived?.toLocaleString() || 0} raised
                       </span>
                       <Link to="/register" state={{ charityId: charity._id }}>
                         <button className="text-sm font-bold text-brand-green hover:text-brand-green/80 flex items-center gap-1 transition-colors">

@@ -55,7 +55,7 @@ export default function WinningsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-black text-brand-green">£{(w.prizeAmount || 0).toFixed(2)}</p>
+                  <p className="text-3xl font-black text-brand-green">₹{(w.prizeAmount || 0).toFixed(2)}</p>
                   {w.status === 'pending' && (
                     <p className="text-xs text-gray-400 mt-1">Awaiting proof upload</p>
                   )}

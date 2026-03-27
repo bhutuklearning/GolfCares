@@ -26,7 +26,7 @@ export default function AdminDashboard() {
         <StatCard icon={Users} label="Total Users" value={stats?.totalUsers || 0} color="green" />
         <StatCard icon={TrendingUp} label="Active Subs" value={stats?.activeSubscriptions || 0} color="accent" />
         <StatCard icon={Trophy} label="Total Draws" value={stats?.totalDraws || 0} color="gold" />
-        <StatCard icon={Heart} label="Charity Funded" value={`£${(stats?.totalDonated || 0).toFixed(0)}`} color="red" />
+        <StatCard icon={Heart} label="Charity Funded" value={`₹${(stats?.totalDonated || 0).toFixed(0)}`} color="red" />
       </div>
 
       {stats?.revenueByMonth && stats.revenueByMonth.length > 0 && (
@@ -42,9 +42,9 @@ export default function AdminDashboard() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
               <XAxis dataKey="month" stroke="#6B7280" tick={{ fontSize: 12 }} />
-              <YAxis stroke="#6B7280" tick={{ fontSize: 12 }} tickFormatter={(v) => `£${v}`} />
+              <YAxis stroke="#6B7280" tick={{ fontSize: 12 }} tickFormatter={(v) => `₹${v}`} />
               <Tooltip contentStyle={{ background: '#111827', border: '1px solid #1F2937', borderRadius: 12 }}
-                labelStyle={{ color: '#fff' }} formatter={(v: any) => [`£${v}`, 'Revenue']} />
+                labelStyle={{ color: '#fff' }} formatter={(v: any) => [`₹${v}`, 'Revenue']} />
               <Area type="monotone" dataKey="revenue" stroke="#00C896" strokeWidth={2} fill="url(#revGrad)" />
             </AreaChart>
           </ResponsiveContainer>

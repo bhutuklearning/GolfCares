@@ -15,8 +15,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const PLANS = [
-  { id: 'monthly', label: 'Monthly', price: '£9.99/mo', desc: 'Billed every month. Cancel anytime.' },
-  { id: 'yearly', label: 'Yearly', price: '£99/yr', desc: 'Save 17%! Billed annually.' },
+  { id: 'monthly', label: 'Monthly', price: '₹799/mo', desc: 'Billed every month. Cancel anytime.' },
+  { id: 'yearly', label: 'Yearly', price: '₹7990/yr', desc: 'Save 17%! Billed annually.' },
 ]
 
 const detailsSchema = z.object({

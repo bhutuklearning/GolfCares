@@ -55,7 +55,7 @@ export default function CharitySettingsPage() {
             <div className="flex-1 min-w-0">
               <p className="font-bold text-white">{c.name}</p>
               <p className="text-gray-400 text-sm mt-1 line-clamp-2">{c.description}</p>
-              <p className="text-xs text-brand-green mt-2 font-medium">£{c.totalReceived?.toLocaleString() || 0} raised</p>
+              <p className="text-xs text-brand-green mt-2 font-medium">₹{c.totalReceived?.toLocaleString() || 0} raised</p>
             </div>
             {selected === c._id && <Check className="w-5 h-5 text-brand-green shrink-0 mt-0.5" />}
           </motion.button>

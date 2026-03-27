@@ -40,7 +40,7 @@ export default function DashboardOverview() {
         <StatCard icon={Target} label="Scores Logged" value={scores.length} color="green" />
         <StatCard icon={TrendingUp} label="Best Score" value={topScore || '--'} color="accent" suffix="pts" />
         <StatCard icon={Trophy} label="Prizes Won" value={winnings.length} color="gold" />
-        <StatCard icon={Heart} label="Total Winnings" value={`£${totalWon.toFixed(2)}`} color="red" />
+        <StatCard icon={Heart} label="Total Winnings" value={`₹${totalWon.toFixed(2)}`} color="red" />
       </div>
 
       {/* Lottery ticket */}
@@ -88,7 +88,7 @@ export default function DashboardOverview() {
                   <p className="text-xs text-gray-400">{new Date(w.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</p>
                 </div>
                 <div className={`font-black text-lg ${w.status === 'paid' ? 'text-brand-green' : 'text-brand-gold'}`}>
-                  £{w.prizeAmount?.toFixed(2)}
+                  ₹{w.prizeAmount?.toFixed(2)}
                 </div>
               </div>
             ))}

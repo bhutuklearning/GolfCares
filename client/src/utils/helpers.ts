@@ -2,9 +2,9 @@
 import { format } from 'date-fns'
 
 export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-GB', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'GBP',
+    currency: 'INR',
     minimumFractionDigits: 2,
   }).format(amount)
 }

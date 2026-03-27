@@ -131,7 +131,7 @@ export default function CharitiesPage() {
                 <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Raised to date</p>
-                    <p className="text-2xl font-black text-brand-green">£{featuredCharities[0].totalReceived?.toLocaleString() || 0}</p>
+                    <p className="text-2xl font-black text-brand-green">₹{featuredCharities[0].totalReceived?.toLocaleString() || 0}</p>
                   </div>
                   <Link to="/register" state={{ charityId: featuredCharities[0]._id }}>
                     <button className="px-6 py-3 bg-brand-green text-black font-bold rounded-xl hover:bg-brand-green/90 transition-all shadow-lg hover:shadow-brand-green/20 hover:scale-105 active:scale-95">
@@ -227,7 +227,7 @@ export default function CharitiesPage() {
                       
                       <div className="flex items-center justify-between pt-4 border-t border-white/10">
                         <span className="text-xs font-bold bg-brand-green/10 text-brand-green px-3 py-1.5 rounded-full">
-                          £{charity.totalReceived?.toLocaleString() || 0} raised
+                          ₹{charity.totalReceived?.toLocaleString() || 0} raised
                         </span>
                         <Link to="/register" state={{ charityId: charity._id }}>
                           <button className="text-sm font-bold text-white hover:text-brand-green flex items-center gap-1 transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg border border-white/10">

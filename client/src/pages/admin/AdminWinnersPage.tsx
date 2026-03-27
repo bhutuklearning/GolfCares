@@ -47,7 +47,7 @@ export default function AdminWinnersPage() {
                         <Icon className="w-3.5 h-3.5" />{sc.label}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400">{w.matchType || w.prizeType} Match — £{w.prizeAmount?.toFixed(2)}</p>
+                    <p className="text-sm text-gray-400">{w.matchType || w.prizeType} Match — ₹{w.prizeAmount?.toFixed(2)}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{new Date(w.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                     {w.proofUrl && (
                       <a href={w.proofUrl} target="_blank" rel="noreferrer"
