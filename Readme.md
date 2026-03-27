@@ -1,10 +1,8 @@
 <div align="center">
   <img src="./client/public/GolfCares.png" alt="GolfCares Logo" width="300" />
   <br />
-  <img src="./client/public/Favicon.png" alt="GolfCares Favicon" width="64" />
-</div>
-
-# GolfCares Technical Assessment
+  
+# GolfCares
 
 A full-stack lottery platform built with modern web technologies, featuring charity integration, payment processing, and real-time draw management.
 
