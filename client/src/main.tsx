@@ -7,6 +7,12 @@ import { Toaster } from 'react-hot-toast'
 import './index.css'
 import App from './App'
 
+// Recover from stale cached index.html referencing old chunks after a deploy.
+// This is a known failure mode for SPAs using code-splitting on static hosts/CDNs.
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload()
+})
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30000, refetchOnWindowFocus: false },

@@ -7,29 +7,52 @@ import Footer from '@/components/layout/Footer'
 import ProtectedRoute from '@/components/shared/ProtectedRoute'
 import AdminRoute from '@/components/shared/AdminRoute'
 
+const lazyWithRetry = (factory: any) =>
+  lazy(async () => {
+    try {
+      return await factory()
+    } catch (err: any) {
+      const msg = String(err?.message || err)
+      const isChunkLoadError =
+        msg.includes('dynamically imported module') ||
+        msg.includes('Importing a module script failed') ||
+        msg.includes('Failed to fetch dynamically imported module')
+
+      // If the deploy changed chunk filenames, refresh once to fetch new index.html.
+      if (isChunkLoadError) {
+        const alreadyReloaded = sessionStorage.getItem('chunk_reload') === '1'
+        if (!alreadyReloaded) {
+          sessionStorage.setItem('chunk_reload', '1')
+          window.location.reload()
+        }
+      }
+      throw err
+    }
+  })
+
 // Lazy loaded pages
-const HomePage = lazy(() => import('@/pages/HomePage'))
-const LoginPage = lazy(() => import('@/pages/LoginPage'))
-const RegisterPage = lazy(() => import('@/pages/RegisterPage'))
-const CharitiesPage = lazy(() => import('@/pages/CharitiesPage'))
-const DrawsPage = lazy(() => import('@/pages/DrawsPage'))
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
+const HomePage = lazyWithRetry(() => import('@/pages/HomePage'))
+const LoginPage = lazyWithRetry(() => import('@/pages/LoginPage'))
+const RegisterPage = lazyWithRetry(() => import('@/pages/RegisterPage'))
+const CharitiesPage = lazyWithRetry(() => import('@/pages/CharitiesPage'))
+const DrawsPage = lazyWithRetry(() => import('@/pages/DrawsPage'))
+const NotFoundPage = lazyWithRetry(() => import('@/pages/NotFoundPage'))
 
 // Dashboard
-const DashboardLayout = lazy(() => import('@/pages/dashboard/DashboardLayout'))
-const DashboardOverview = lazy(() => import('@/pages/dashboard/DashboardOverview'))
-const ScoresPage = lazy(() => import('@/pages/dashboard/ScoresPage'))
-const CharitySettingsPage = lazy(() => import('@/pages/dashboard/CharitySettingsPage'))
-const WinningsPage = lazy(() => import('@/pages/dashboard/WinningsPage'))
-const SettingsPage = lazy(() => import('@/pages/dashboard/SettingsPage'))
+const DashboardLayout = lazyWithRetry(() => import('@/pages/dashboard/DashboardLayout'))
+const DashboardOverview = lazyWithRetry(() => import('@/pages/dashboard/DashboardOverview'))
+const ScoresPage = lazyWithRetry(() => import('@/pages/dashboard/ScoresPage'))
+const CharitySettingsPage = lazyWithRetry(() => import('@/pages/dashboard/CharitySettingsPage'))
+const WinningsPage = lazyWithRetry(() => import('@/pages/dashboard/WinningsPage'))
+const SettingsPage = lazyWithRetry(() => import('@/pages/dashboard/SettingsPage'))
 
 // Admin
-const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'))
-const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'))
-const AdminUsers = lazy(() => import('@/pages/admin/AdminUsersPage'))
-const AdminDraws = lazy(() => import('@/pages/admin/AdminDrawsPage'))
-const AdminCharities = lazy(() => import('@/pages/admin/AdminCharitiesPage'))
-const AdminWinners = lazy(() => import('@/pages/admin/AdminWinnersPage'))
+const AdminLayout = lazyWithRetry(() => import('@/pages/admin/AdminLayout'))
+const AdminDashboard = lazyWithRetry(() => import('@/pages/admin/AdminDashboard'))
+const AdminUsers = lazyWithRetry(() => import('@/pages/admin/AdminUsersPage'))
+const AdminDraws = lazyWithRetry(() => import('@/pages/admin/AdminDrawsPage'))
+const AdminCharities = lazyWithRetry(() => import('@/pages/admin/AdminCharitiesPage'))
+const AdminWinners = lazyWithRetry(() => import('@/pages/admin/AdminWinnersPage'))
 
 const SuspenseFallback = () => (
   <div className="min-h-screen bg-brand-dark flex flex-col items-center justify-center">
