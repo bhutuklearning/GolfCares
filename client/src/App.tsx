@@ -10,20 +10,29 @@ import AdminRoute from '@/components/shared/AdminRoute'
 const lazyWithRetry = (factory: any) =>
   lazy(async () => {
     try {
-      return await factory()
+      const module = await factory()
+      // Success — clear the reload flag so future deploys can retry
+      sessionStorage.removeItem('chunk_reload')
+      return module
     } catch (err: any) {
       const msg = String(err?.message || err)
       const isChunkLoadError =
         msg.includes('dynamically imported module') ||
         msg.includes('Importing a module script failed') ||
-        msg.includes('Failed to fetch dynamically imported module')
+        msg.includes('Failed to fetch dynamically imported module') ||
+        msg.includes('error loading dynamically imported module')
 
-      // If the deploy changed chunk filenames, refresh once to fetch new index.html.
+      // After a Vercel redeploy, chunk filenames change.
+      // Force-reload the page with a cache-busted URL so the browser
+      // fetches the latest index.html and its new chunk manifest.
       if (isChunkLoadError) {
         const alreadyReloaded = sessionStorage.getItem('chunk_reload') === '1'
         if (!alreadyReloaded) {
           sessionStorage.setItem('chunk_reload', '1')
-          window.location.reload()
+          // Add ?v= timestamp to bust CDN/browser cache
+          window.location.replace(`${window.location.href.split('?')[0]}?v=${Date.now()}`)
+          // Return a dummy module to prevent throw during redirect
+          return { default: () => null }
         }
       }
       throw err
