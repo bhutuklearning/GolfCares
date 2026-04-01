@@ -17,6 +17,6 @@ export const adminApi = {
   verifyWinner: (id: string, data: any) => api.put(`/api/winners/${id}/verify`, data).then(r => r.data),
   // Charities (admin create/update/delete)
   createCharity: (data: FormData) => api.post('/api/charities', data, { headers: { 'Content-Type': 'multipart/form-data' }}).then(r => r.data),
-  updateCharity: (id: string, data: any) => api.put(`/api/charities/${id}`, data).then(r => r.data),
+  updateCharity: (id: string, data: FormData) => api.put(`/api/charities/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' }}).then(r => r.data),
   deleteCharity: (id: string) => api.delete(`/api/charities/${id}`).then(r => r.data),
 }

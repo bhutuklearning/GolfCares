@@ -1,18 +1,24 @@
 // @ts-nocheck
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Search, Plus, MoreVertical, Heart, Star, Edit, Trash } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { charityApi } from '@/api/charity.api'
+import { adminApi } from '@/api/admin.api'
 import { useAuthStore } from '@/store/authStore'
 import { mockCharities } from '@/mocks/mockData'
 import { formatCurrency } from '@/utils/helpers'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import CharityFormModal from './CharityFormModal'
 
 export default function AdminCharitiesPage() {
   const [search, setSearch] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedCharity, setSelectedCharity] = useState<any>(null)
   const { useMockData } = useAuthStore()
+  const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery<any>({ queryKey: ['adminCharities'], queryFn: () => charityApi.getCharities(),  enabled: !useMockData  })
   const charities = useMockData ? mockCharities : data?.charities || []
@@ -20,6 +26,22 @@ export default function AdminCharitiesPage() {
   const filtered = charities.filter((c: any) => 
     c.name.toLowerCase().includes(search.toLowerCase())
   )
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => adminApi.deleteCharity(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminCharities'] })
+      queryClient.invalidateQueries({ queryKey: ['charities'] })
+      toast.success('Charity deleted successfully')
+    },
+    onError: () => toast.error('Failed to delete charity')
+  })
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this charity?')) {
+      deleteMutation.mutate(id)
+    }
+  }
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -38,7 +60,7 @@ export default function AdminCharitiesPage() {
               className="pl-10 bg-brand-muted border-white/10 text-white focus-visible:ring-brand-green w-full" 
             />
           </div>
-          <Button className="bg-brand-green text-black font-bold hover:bg-brand-green/90 shrink-0">
+          <Button onClick={() => { setSelectedCharity(null); setIsModalOpen(true); }} className="bg-brand-green text-black font-bold hover:bg-brand-green/90 shrink-0">
             <Plus className="w-4 h-4 mr-2" /> Add Charity
           </Button>
         </div>
@@ -99,7 +121,7 @@ export default function AdminCharitiesPage() {
                           <MoreVertical className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-brand-card border-white/10 text-white w-48 shadow-xl">
-                          <DropdownMenuItem className="focus:bg-white/5 focus:text-white cursor-pointer py-2">
+                          <DropdownMenuItem onClick={() => { setSelectedCharity(charity); setIsModalOpen(true); }} className="focus:bg-white/5 focus:text-white cursor-pointer py-2">
                             <Edit className="w-4 h-4 mr-2" /> Edit Details
                           </DropdownMenuItem>
                           {!charity.isFeatured && (
@@ -107,7 +129,7 @@ export default function AdminCharitiesPage() {
                               <Star className="w-4 h-4 mr-2 text-brand-gold" /> Mark Featured
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem className="focus:bg-red-500/20 focus:text-red-400 text-red-500 cursor-pointer py-2 border-t border-white/5 mt-1 pt-2">
+                          <DropdownMenuItem onClick={() => handleDelete(charity._id)} className="focus:bg-red-500/20 focus:text-red-400 text-red-500 cursor-pointer py-2 border-t border-white/5 mt-1 pt-2">
                             <Trash className="w-4 h-4 mr-2" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -120,6 +142,8 @@ export default function AdminCharitiesPage() {
           </table>
         </div>
       </div>
+      
+      <CharityFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} initialData={selectedCharity} />
     </div>
   )
 }

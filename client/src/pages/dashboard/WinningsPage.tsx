@@ -3,7 +3,9 @@ import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Trophy, Loader2, AlertCircle, CheckCircle2, Clock } from 'lucide-react'
 import { winnerApi } from '@/api/winner.api'
-
+import { Button } from '@/components/ui/button'
+import ProofUploadModal from './ProofUploadModal'
+import { useState } from 'react'
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
   pending: { label: 'Pending Verification', color: 'text-brand-gold', icon: Clock },
   verified: { label: 'Verified — Awaiting Payout', color: 'text-brand-green', icon: CheckCircle2 },
@@ -14,6 +16,9 @@ const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = 
 export default function WinningsPage() {
   const { data, isLoading } = useQuery({ queryKey: ['myWinnings'], queryFn: winnerApi.getMyWinnings })
   const winnings = data?.winnings || []
+
+  const [selectedWinnerId, setSelectedWinnerId] = useState<string | null>(null)
+  const isModalOpen = selectedWinnerId !== null
 
   if (isLoading) return (
     <div className="flex justify-center items-center min-h-[300px]">
@@ -56,8 +61,15 @@ export default function WinningsPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-black text-brand-green">₹{(w.prizeAmount || 0).toFixed(2)}</p>
-                  {w.status === 'pending' && (
-                    <p className="text-xs text-gray-400 mt-1">Awaiting proof upload</p>
+                  {status.label === 'Pending Verification' && !w.proofImageUrl && (
+                    <div className="mt-2 text-right">
+                      <Button onClick={() => setSelectedWinnerId(w._id)} variant="outline" size="sm" className="border-brand-green text-brand-green hover:bg-brand-green/10 text-xs py-1 h-8">
+                        Upload Proof
+                      </Button>
+                    </div>
+                  )}
+                  {status.label === 'Pending Verification' && w.proofImageUrl && (
+                    <p className="text-xs text-brand-gold mt-1">Proof under review</p>
                   )}
                 </div>
               </motion.div>
@@ -65,6 +77,12 @@ export default function WinningsPage() {
           })}
         </div>
       )}
+      
+      <ProofUploadModal 
+        winnerId={selectedWinnerId} 
+        isOpen={isModalOpen} 
+        onClose={() => setSelectedWinnerId(null)} 
+      />
     </div>
   )
 }
