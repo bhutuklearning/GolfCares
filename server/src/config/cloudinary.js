@@ -21,7 +21,10 @@ const proofStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'golf-charity-platform/proofs',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf']
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    // Auto-compress and cap dimensions — keeps the image readable for admin review
+    // while dramatically reducing storage size and processing time
+    transformation: [{ width: 1920, height: 1080, crop: 'limit', quality: 'auto:good', fetch_format: 'auto' }]
   }
 })
 
@@ -32,7 +35,7 @@ const upload = multer({
 
 const uploadProof = multer({
   storage: proofStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }
+  limits: { fileSize: 8 * 1024 * 1024 } // 8 MB max for proof images
 })
 
 export { upload, uploadProof }
